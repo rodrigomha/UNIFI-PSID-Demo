@@ -55,7 +55,7 @@ eig_summary_static = summary_eigenvalues(sm_static)
 scatter(eigs_static, label = "Static Network")
 scatter!(eigs, label = "Dynamic Network", markershape = :xcross)
 
-println("Not really useful comparison, 
+println("\nNot really useful comparison, 
 since there are states that are are insanely fast,
 and associated with the network dynamics, both voltages and lines.
 At this point is more convenient to directly look at the eigenvalue summary
@@ -68,7 +68,7 @@ println("\nStatic Network Summary")
 show(eig_summary_static, allrows = true)
 
 println(
-    "It looks like, eigenvalues for dynamic network 1-10 and 25-26 are clearly associated
+    "\nIt looks like, eigenvalues for dynamic network 1-10 and 25-26 are clearly associated
 with the network so we can remove them to observe differences.",
 )
 
@@ -81,7 +81,7 @@ scatter!(
 )
 
 println(
-    "Neglecting the network moves eigenvalues, but do not induce instability in this system",
+    "\nNeglecting the network moves eigenvalues, but do not induce instability in this system",
 )
 
 # Run Simulation

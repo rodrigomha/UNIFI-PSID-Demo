@@ -87,9 +87,9 @@ scatter!(
 )
 
 println(
-    "This is a well known Bifurcation in Quasi-Static Phasor Power Systems Literature
-of Machine against a constant power load. It is a well known subcritical Hopf Bifurcation and
-we can observe the limit cycle.",
+    "\nThis is a well known Bifurcation in Quasi-Static Phasor Power Systems Literature
+of Machine against a constant power load. It is a subcritical Hopf Bifurcation and
+we can observe the limit cycles in PowerSimulationsDynamics.",
 )
 
 ## Run Bifurcation
@@ -114,7 +114,7 @@ summary_eigs = summary_eigenvalues(sm)
 show(summary_eigs)
 
 println(
-    "We ignore Eigenvalue 10, since it is associated with the fixed reference frame angle.
+    "\nWe ignore Eigenvalue 10, since it is associated with the fixed reference frame angle.
 Observe that eigenvalues 8 and 9 are close to instability, associated mostly with eq_p (and Vf)",
 )
 
@@ -129,7 +129,7 @@ t, Vf = get_state_series(results, ("generator-101-1", :Vf))
 # Plot a phase portrait transient EMF (eq_p) vs Field Voltage E_fd (or Vf)
 plot(eq_p, Vf, xlabel = "eq_p", ylabel = "E_fd", linewidth = 2, label = "Shift 0.05")
 
-println("This showcase that doing a perturbation of 0.05 results in an unstable scenario.")
+println("\nThis showcase that doing a perturbation of 0.05 results in an unstable scenario.")
 
 ## Limit Cycle
 pert_state = PSID.PerturbState(1.0, 5, -0.01)
@@ -157,4 +157,4 @@ t, eq_p3 = get_state_series(results, ("generator-101-1", :eq_p))
 t, Vf3 = get_state_series(results, ("generator-101-1", :Vf))
 plot!(eq_p3, Vf3, xlabel = "eq_p", ylabel = "E_fd", linewidth = 2, label = "Shift -0.005")
 
-println("Smaller perturbations of -0.01 and -0.005 result in 'stable' limit cycles.")
+println("\nSmaller perturbations of -0.01 and -0.005 result in 'stable' limit cycles.")
