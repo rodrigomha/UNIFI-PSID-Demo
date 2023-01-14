@@ -15,20 +15,11 @@ Marconato_ex() = MarconatoMachine(
     0.03, #Td0_pp
     0.05, #Tq0_pp
     0.0, #T_AA
-) 
-
-shaft_ex() = SingleMass(
-    H = 6.175,
-    D = 0.05,
 )
 
-avr_sexs() = SEXS(
-    Ta_Tb = 0.4,
-    Tb = 5.0,
-    K = 20.0,
-    Te = 1.0,
-    V_lim = (-999.0, 999.0)
-)
+shaft_ex() = SingleMass(H = 6.175, D = 0.05)
+
+avr_sexs() = SEXS(Ta_Tb = 0.4, Tb = 5.0, K = 20.0, Te = 1.0, V_lim = (-999.0, 999.0))
 tg_tgov1() = SteamTurbineGov1(
     R = 0.05,
     T1 = 0.2,
@@ -38,20 +29,19 @@ tg_tgov1() = SteamTurbineGov1(
     D_T = 0.0,
     DB_h = 0.0,
     DB_l = 0.0,
-    T_rate = 0.0
+    T_rate = 0.0,
 )
 pss_none() = PSSFixed(0.0)
-
 
 function dyn_marconato(gen)
     return PSY.DynamicGenerator(
         name = get_name(gen),
         ω_ref = 1.0,
-        machine = Marconato_ex(), 
-        shaft = shaft_ex(), 
-        avr = avr_sexs(), 
-        prime_mover = tg_tgov1(), 
-        pss = pss_none(), 
+        machine = Marconato_ex(),
+        shaft = shaft_ex(),
+        avr = avr_sexs(),
+        prime_mover = tg_tgov1(),
+        pss = pss_none(),
     )
 end
 
@@ -69,7 +59,6 @@ function outer_control_vsm()
     end
     return OuterControl(virtual_inertia(), reactive_droop())
 end
-
 
 ######## Inner Controls #########
 inner_control() = VoltageModeControl(
@@ -108,6 +97,5 @@ function inv_vsm(static_device)
         stiff_source(), # dc source
         no_pll(), # pll
         filt(), # filter
-    ) 
+    )
 end
-
