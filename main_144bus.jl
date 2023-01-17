@@ -48,7 +48,9 @@ execute!(sim, IDA(), abstol = 1e-9)
 # Get Results
 results = read_results(sim)
 
-voltage = get_voltage_magnitude_series(results, 4)
+voltage = get_voltage_magnitude_series(results, 3)
 
 plotlyjs()
+# Bus will most likely increase because generator being tripped is consuming reactive power
 plot(voltage)
+
