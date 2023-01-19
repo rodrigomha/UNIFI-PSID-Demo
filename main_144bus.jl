@@ -2,7 +2,7 @@ using Revise
 using PowerSystems
 using PowerSimulationsDynamics
 using Sundials
-using Plots
+using PlotlyJS
 using PowerFlows
 using Logging
 using DataFrames
@@ -28,10 +28,10 @@ gen = [gen for gen in syncGen if occursin("Trip", gen.name)][1]
 genTrip = GeneratorTrip(tripTime, PSY.get_component(PSY.DynamicGenerator, sys, gen.name))
 
 sim = Simulation(
-        ResidualModel, 
-        sys,         
-        pwd(),       
-        tspan, 
+        ResidualModel,
+        sys,
+        pwd(),
+        tspan,
         genTrip,
         all_lines_dynamic = true,
     )
@@ -48,9 +48,10 @@ execute!(sim, IDA(), abstol = 1e-9)
 # Get Results
 results = read_results(sim)
 
-voltage = get_voltage_magnitude_series(results, 3)
 
-plotlyjs()
+
+
+t, voltage = get_voltage_magnitude_series(results, 3)
+
 # Bus will most likely increase because generator being tripped is consuming reactive power
-plot(voltage)
-
+plot(scatter(y = voltage, x = t))
