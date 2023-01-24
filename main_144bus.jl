@@ -48,10 +48,12 @@ execute!(sim, IDA(), abstol = 1e-9)
 # Get Results
 results = read_results(sim)
 
-
-
-
 t, voltage = get_voltage_magnitude_series(results, 3)
 
 # Bus will most likely increase because generator being tripped is consuming reactive power
-plot(scatter(y = voltage, x = t))
+plot(scatter(y = voltage, x = t),
+Layout(
+    xaxis_title = "Time",
+    yaxis_title = "Active Power [pu]",
+    title = "Voltage Magnitude Bus 3",
+))

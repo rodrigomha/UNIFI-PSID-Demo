@@ -2,7 +2,7 @@ using Revise
 using PowerSystems
 using PowerSimulationsDynamics
 using Sundials
-using Plots
+using PlotlyJS
 using PowerFlows
 using Logging
 using DataFrames
@@ -65,32 +65,26 @@ for p in P_range
     end
 end
 
-# Plot PV Curve
-plot(
-    P_load_p,
-    V_load_p,
-    color = :blue,
-    label = "PV Curve",
-    xlabel = "Load Power [pu]",
-    ylabel = "Load Bus Voltage [pu]",
-)
-
 # Obtain indices where in the PV Curve the system is small signal stable
 true_ixs = findall(x -> x, stability_results)
 
-# Plot where is stable
-scatter!(
-    P_load_p[true_ixs],
-    V_load_p[true_ixs],
-    markerstrokewidth = 0,
-    label = "Stable Region",
-)
-
-println(
-    "\nThis is a well known Bifurcation in Quasi-Static Phasor Power Systems Literature
-of Machine against a constant power load. It is a subcritical Hopf Bifurcation and
-we can observe the limit cycles in PowerSimulationsDynamics.",
-)
+# Plot PV Curve
+plot([scatter(
+    x = P_load_p,
+    y = V_load_p,
+    line_color = :blue,
+    name = "PV curve",
+),
+scatter(
+    x = P_load_p[true_ixs],
+    y = V_load_p[true_ixs],
+    name = "Stable Region",
+    mode = "markers"
+)],
+Layout(title = "PV Curve",
+xaxis_title = "Load Power [pu]",
+yaxis_title = "Load Bus Voltage [pu]",
+))
 
 ## Run Bifurcation
 
@@ -113,23 +107,22 @@ sm = small_signal_analysis(sim)
 summary_eigs = summary_eigenvalues(sm)
 show(summary_eigs)
 
-println(
-    "\nWe ignore Eigenvalue 10, since it is associated with the fixed reference frame angle.
-Observe that eigenvalues 8 and 9 are close to instability, associated mostly with eq_p (and Vf)",
-)
-
 # Run the Simulation
 execute!(sim, IDA(), abstol = 1e-9, reltol = 1e-9)
 results = read_results(sim)
 
 # Read state time series
-t, eq_p = get_state_series(results, ("generator-101-1", :eq_p))
-t, Vf = get_state_series(results, ("generator-101-1", :Vf))
+_, eq_p = get_state_series(results, ("generator-101-1", :eq_p))
+_, Vf = get_state_series(results, ("generator-101-1", :Vf))
 
 # Plot a phase portrait transient EMF (eq_p) vs Field Voltage E_fd (or Vf)
-plot(eq_p, Vf, xlabel = "eq_p", ylabel = "E_fd", linewidth = 2, label = "Shift 0.05")
-
-println("\nThis showcase that doing a perturbation of 0.05 results in an unstable scenario.")
+plot(
+    scatter(x = eq_p, y = Vf, line_width = 2, name = "Shift 0.05"),
+    Layout(
+        xaxis_title = "eq_p",
+        yaxis_title = "E_fd",
+        )
+)
 
 ## Limit Cycle
 pert_state = PSID.PerturbState(1.0, 5, -0.01)
@@ -140,9 +133,17 @@ sm = small_signal_analysis(sim)
 execute!(sim, IDA(), abstol = 1e-9, reltol = 1e-9)
 results = read_results(sim)
 
-t, eq_p2 = get_state_series(results, ("generator-101-1", :eq_p))
-t, Vf2 = get_state_series(results, ("generator-101-1", :Vf))
-plot!(eq_p2, Vf2, xlabel = "eq_p", ylabel = "E_fd", linewidth = 2, label = "Shift -0.01")
+_, eq_p2 = get_state_series(results, ("generator-101-1", :eq_p))
+_, Vf2 = get_state_series(results, ("generator-101-1", :Vf))
+
+plot(
+    [scatter(x = eq_p, y = Vf, line_width = 2, name = "Shift 0.05"),
+    scatter(x = eq_p2, y = Vf2, line_width = 2, name = "Shift -0.01")],
+    Layout(
+        xaxis_title = "eq_p",
+        yaxis_title = "E_fd",
+        )
+)
 
 ## Limit Cycle2
 pert_state = PSID.PerturbState(1.0, 5, -0.005)
@@ -153,8 +154,15 @@ sm = small_signal_analysis(sim)
 execute!(sim, IDA(), abstol = 1e-9, reltol = 1e-9)
 results = read_results(sim)
 
-t, eq_p3 = get_state_series(results, ("generator-101-1", :eq_p))
-t, Vf3 = get_state_series(results, ("generator-101-1", :Vf))
-plot!(eq_p3, Vf3, xlabel = "eq_p", ylabel = "E_fd", linewidth = 2, label = "Shift -0.005")
+_, eq_p3 = get_state_series(results, ("generator-101-1", :eq_p))
+_, Vf3 = get_state_series(results, ("generator-101-1", :Vf))
 
-println("\nSmaller perturbations of -0.01 and -0.005 result in 'stable' limit cycles.")
+plot(
+    [scatter(x = eq_p, y = Vf, line_width = 2, name = "Shift 0.05 Unstable"),
+    scatter(x = eq_p2, y = Vf2, line_width = 2, name = "Shift -0.01 Stable"),
+    scatter(x = eq_p3, y = Vf3, line_width = 2, name = "Shift -0.005 Limit Cycle")],
+    Layout(
+        xaxis_title = "eq_p",
+        yaxis_title = "E_fd",
+        )
+)

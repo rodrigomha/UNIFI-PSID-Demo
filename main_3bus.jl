@@ -2,7 +2,7 @@ using Revise
 using PowerSystems
 using PowerSimulationsDynamics
 using Sundials
-using Plots
+using PlotlyJS
 using PowerFlows
 using Logging
 using DataFrames
@@ -52,14 +52,8 @@ sm_static = small_signal_analysis(sim_static)
 eigs_static = sm_static.eigenvalues
 eig_summary_static = summary_eigenvalues(sm_static)
 
-scatter(eigs_static, label = "Static Network")
-scatter!(eigs, label = "Dynamic Network", markershape = :xcross)
-
-println("\nNot really useful comparison, 
-since there are states that are are insanely fast,
-and associated with the network dynamics, both voltages and lines.
-At this point is more convenient to directly look at the eigenvalue summary
-for both cases and look at the differences there.")
+plot([scatter(x = real.(eigs_static), y = imag.(eigs_static), name = "Static Network",  mode="markers"),
+scatter(x = real.(eigs), y = imag.(eigs), name = "Dynamic Network",  mode="markers", marker_symbol="cross")])
 
 println("\nDynamic Network Summary")
 show(eig_summary, allrows = true)
@@ -67,22 +61,9 @@ show(eig_summary, allrows = true)
 println("\nStatic Network Summary")
 show(eig_summary_static, allrows = true)
 
-println(
-    "\nIt looks like, eigenvalues for dynamic network 1-10 and 25-26 are clearly associated
-with the network so we can remove them to observe differences.",
-)
-
 eigs_no_network = vcat(eigs[11:24], eigs[27:end])
-scatter(eigs_static, label = "Static Network")
-scatter!(
-    eigs_no_network,
-    label = "Dynamic Network without fast eigvals",
-    markershape = :xcross,
-)
-
-println(
-    "\nNeglecting the network moves eigenvalues, but do not induce instability in this system",
-)
+plot([scatter(x = real.(eigs_no_network), y = imag.(eigs_no_network), name = "Static Network",  mode="markers"),
+scatter(x = real.(eigs_no_network), y = imag.(eigs_no_network), name = "Dynamic Network",  mode="markers", marker_symbol="cross")])
 
 # Run Simulation
 execute!(sim, IDA(), abstol = 1e-9)
@@ -91,27 +72,33 @@ execute!(sim, IDA(), abstol = 1e-9)
 results = read_results(sim)
 
 # Plot Change of Power
-power = get_activepower_series(results, "generator-103-1")
-plot(
-    power,
-    xlabel = "Time",
-    ylabel = "Active Power [pu]",
-    label = "Active Power Output GFM VSM Bus 3",
-)
+sim_time, power = get_activepower_series(results, "generator-103-1")
+plot(scatter(
+    x = sim_time,
+    y = power),
+    Layout(
+    xaxis_title = "Time",
+    yaxis_title = "Active Power [pu]",
+    title = "Active Power Output GFM VSM Bus 3",
+))
 
 # Get Voltage Magnitude at Inverter Bus
-voltage = get_voltage_magnitude_series(results, 103)
-plot(
-    voltage,
-    xlabel = "Time",
-    ylabel = "Voltage Magnitude [pu]",
-    label = "Voltage Magnitude Bus 3",
-)
+sim_time, voltage = get_voltage_magnitude_series(results, 103)
+plot(scatter(
+    x = sim_time,
+    y = voltage),
+    Layout(
+    xaxis_title = "Time",
+    yaxis_title = "Active Power [pu]",
+    title = "Voltage Magnitude Bus 3",
+))
 
-voltage_bus2 = get_voltage_magnitude_series(results, 102)
-plot(
-    voltage_bus2,
-    xlabel = "Time",
-    ylabel = "Voltage Magnitude [pu]",
-    label = "Voltage Magnitude Bus 2",
-)
+sim_time, voltage_bus2 = get_voltage_magnitude_series(results, 102)
+plot(scatter(
+    x = sim_time,
+    y = voltage_bus2),
+    Layout(
+    xaxis_title = "Time",
+    yaxis_title = "Active Power [pu]",
+    title = "Voltage Magnitude Bus 2",
+))
