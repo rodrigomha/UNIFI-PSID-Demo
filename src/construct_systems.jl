@@ -101,11 +101,11 @@ function construct_144bus_system()
     
     end 
 
-    if !isfile(joinpath(dirname(@__FILE__), "../json_files/144Bus/144Bus.json"))
-        to_json(sys, joinpath(dirname(@__FILE__), "../json_files/144Bus/144Bus.json"))
-    end
     for l in get_components(PSY.PowerLoad, sys)
         PSY.set_model!(l, PSY.LoadModels.ConstantImpedance)
+    end
+    if !isfile(joinpath(dirname(@__FILE__), "../json_files/144Bus/144Bus.json"))
+        to_json(sys, joinpath(dirname(@__FILE__), "../json_files/144Bus/144Bus.json"))
     end
     return sys
 end
