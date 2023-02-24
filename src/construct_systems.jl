@@ -27,7 +27,11 @@ end
 
 function construct_144bus_system()
     sys_dir = joinpath(dirname(@__FILE__), "../data/144Bus.raw")
-    sys = System(sys_dir, runchecks = false)
+    sys = System(
+        sys_dir,
+        bus_name_formatter = x -> "Bus_" * string(x["index"]),
+        runchecks = false,
+    )
     set_units_base_system!(sys, "DEVICE_BASE")
 
     df = solve_powerflow(sys)
