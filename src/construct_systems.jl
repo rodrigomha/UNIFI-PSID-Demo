@@ -39,9 +39,9 @@ function construct_144bus_system()
     
     # Reallocate Power
     # Grid Following
-    Gf=0.15
+    GFL=0.15
     # Grid Forming
-    GF=0.02
+    GFM=0.02
 
     syncGen = collect(get_components(Generator, sys));
     # Trip Capacity
@@ -87,19 +87,19 @@ function construct_144bus_system()
             set_base_power!(g.dynamic_injector, trip_cap)
             set_active_power!(g, 0.7)
         elseif g.bus.number != 1 && g.bus.number != 3
-            set_base_power!(g, bus_capacity[g.bus.name]*(1-GF-Gf))
-            set_base_power!(g.dynamic_injector, bus_capacity[g.bus.name]*(1-GF-Gf))
+            set_base_power!(g, bus_capacity[g.bus.name]*(1-GFM-GFL))
+            set_base_power!(g.dynamic_injector, bus_capacity[g.bus.name]*(1-GFM-GFL))
         end
     
         if g.bus.number != 1
-            storage=add_battery(sys, join(["GF_Battery-", g.bus.number]), g.bus.name, GF*bus_capacity[g.bus.name], get_active_power(g), get_reactive_power(g))
+            storage=add_battery(sys, join(["GFM_Battery_", g.bus.number]), g.bus.name, GFM*bus_capacity[g.bus.name], get_active_power(g), get_reactive_power(g))
             add_component!(sys, storage)
-            inverter=add_grid_forming(storage, GF*bus_capacity[g.bus.name])
+            inverter=add_grid_forming(storage, GFM*bus_capacity[g.bus.name])
             add_component!(sys, inverter, storage)
     
-            storage=add_battery(sys, join(["Gf_Battery-", g.bus.number]), g.bus.name, Gf*bus_capacity[g.bus.name], get_active_power(g), get_reactive_power(g))
+            storage=add_battery(sys, join(["GFL_Battery_", g.bus.number]), g.bus.name, GFL*bus_capacity[g.bus.name], get_active_power(g), get_reactive_power(g))
             add_component!(sys, storage)
-            inverter=add_grid_following(storage, Gf*bus_capacity[g.bus.name])
+            inverter=add_grid_following(storage, GFL*bus_capacity[g.bus.name])
             add_component!(sys, inverter, storage)
         end
     
